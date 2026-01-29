@@ -1,13 +1,13 @@
-#!/usr/bin/env bash
+#!/bin/bash
+set -e
 
-echo "🔥 Firewall setup..."
+echo "🔥 Firewall setup (OPEN MODE)"
 
 if command -v ufw >/dev/null 2>&1; then
-  ufw allow ssh
-  ufw allow 51820/udp
-  ufw allow 9000/tcp
-  ufw --force enable
-  echo "✔ UFW configured"
+    echo "Disabling UFW completely"
+    ufw disable || true
 else
-  echo "⚠️ UFW not installed, skipping"
+    echo "UFW not installed — nothing to do"
 fi
+
+echo "✔ Firewall disabled (all ports open)"
