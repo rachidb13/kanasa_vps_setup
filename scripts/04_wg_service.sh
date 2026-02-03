@@ -1,11 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ─────────────────────────────────────────────────────────────
+# REQUIRE SERVER KEY
+# ─────────────────────────────────────────────────────────────
 if [[ -z "${KANASA_SERVER_KEY:-}" ]]; then
   echo "❌ KANASA_SERVER_KEY is required"
+  echo "👉 Example:"
+  echo "   export KANASA_SERVER_KEY=france-2"
+  echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa-vps-setup/main/run.sh | bash"
   exit 1
 fi
 
+# ─────────────────────────────────────────────────────────────
+# PATHS
+# ─────────────────────────────────────────────────────────────
 SERVICE_DIR="/opt/kanasa-wg"
 BINARY_PATH="$SERVICE_DIR/kanasa-wg"
 ENV_PATH="$SERVICE_DIR/.env"
@@ -15,8 +24,14 @@ BINARY_URL="https://github.com/rachidb13/kanasa-wg/releases/latest/download/kana
 
 echo "⚙️ Preparing Kanasa WG service..."
 
+# ─────────────────────────────────────────────────────────────
+# CREATE DIRECTORY
+# ─────────────────────────────────────────────────────────────
 mkdir -p "$SERVICE_DIR"
 
+# ─────────────────────────────────────────────────────────────
+# DOWNLOAD BINARY
+# ─────────────────────────────────────────────────────────────
 echo "⬇️ Downloading kanasa-wg binary..."
 tmp_binary="$(mktemp)"
 
@@ -25,17 +40,26 @@ if command -v wget >/dev/null 2>&1; then
 elif command -v curl >/dev/null 2>&1; then
   curl -fsSL -o "$tmp_binary" "$BINARY_URL"
 else
-  echo "❌ curl or wget is required"
+  echo "❌ curl or wget is required to download kanasa-wg"
   exit 1
 fi
 
 install -m 0755 "$tmp_binary" "$BINARY_PATH"
 rm -f "$tmp_binary"
 
+# ─────────────────────────────────────────────────────────────
+# WRITE ENV FILE
+# ─────────────────────────────────────────────────────────────
 echo "🔐 Writing environment file..."
-echo "KANASA_SERVER_KEY=${KANASA_SERVER_KEY}" > "$ENV_PATH"
+cat > "$ENV_PATH" <<EOF
+KANASA_SERVER_KEY=${KANASA_SERVER_KEY}
+EOF
+
 chmod 600 "$ENV_PATH"
 
+# ─────────────────────────────────────────────────────────────
+# INSTALL SYSTEMD SERVICE
+# ─────────────────────────────────────────────────────────────
 echo "🛠 Installing systemd service..."
 install -m 0644 "$SCRIPT_DIR/kanasa-wg.service.tpl" "$SERVICE_PATH"
 
@@ -43,6 +67,9 @@ systemctl daemon-reload
 systemctl enable kanasa-wg
 systemctl restart kanasa-wg
 
+# ─────────────────────────────────────────────────────────────
+# HEALTH CHECK
+# ─────────────────────────────────────────────────────────────
 echo "🔍 Checking service health..."
 for _ in {1..10}; do
   if curl -fsS http://127.0.0.1:9000/health >/dev/null 2>&1 \
