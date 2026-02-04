@@ -24,7 +24,6 @@ if ! [[ "$KANASA_WG_PORT" =~ ^[0-9]+$ ]] || (( KANASA_WG_PORT < 1 || KANASA_WG_P
   exit 1
 fi
 
-
 # ─────────────────────────────────────────────────────────────
 # CHECK PORT AVAILABILITY
 # ─────────────────────────────────────────────────────────────
@@ -46,8 +45,6 @@ if ss -lnt "( sport = :$KANASA_WG_PORT )" | grep -q LISTEN; then
 fi
 
 echo "✔ Port $KANASA_WG_PORT is free"
-
-
 
 # ─────────────────────────────────────────────────────────────
 # PATHS
@@ -72,12 +69,55 @@ mkdir -p "$SERVICE_DIR"
 echo "⬇️ Downloading kanasa-wg binary..."
 tmp_binary="$(mktemp)"
 
-@@ -99,26 +53,25 @@ chmod 600 "$ENV_PATH"
+if curl -fsSL "$BINARY_URL" -o "$tmp_binary"; then
+  chmod +x "$tmp_binary"
+  mv "$tmp_binary" "$BINARY_PATH"
+  echo "✔ Binary downloaded"
+else
+  echo "❌ Failed to download binary"
+  rm -f "$tmp_binary"
+  exit 1
+fi
+
+# ─────────────────────────────────────────────────────────────
+# CREATE CONFIGURATION
+# ─────────────────────────────────────────────────────────────
+echo "📝 Creating configuration..."
+cat <<EOF > "$ENV_PATH"
+PORT=${KANASA_WG_PORT}
+KANASA_SERVER_KEY=${KANASA_SERVER_KEY}
+EOF
+chmod 600 "$ENV_PATH"
+
 # ─────────────────────────────────────────────────────────────
 # INSTALL SYSTEMD SERVICE
 # ─────────────────────────────────────────────────────────────
 echo "🛠 Installing systemd service..."
-install -m 0644 "$SCRIPT_DIR/kanasa-wg.service.tpl" "$SERVICE_PATH"
+
+# Check if template exists, fallback to generating it if missing
+if [[ -f "$SCRIPT_DIR/kanasa-wg.service.tpl" ]]; then
+  install -m 0644 "$SCRIPT_DIR/kanasa-wg.service.tpl" "$SERVICE_PATH"
+else
+  # Emergency fallback to prevent failure if tpl is missing
+  cat <<EOF > "$SERVICE_PATH"
+[Unit]
+Description=Kanasa WireGuard Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=$SERVICE_DIR
+ExecStart=$BINARY_PATH
+EnvironmentFile=$ENV_PATH
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  chmod 644 "$SERVICE_PATH"
+fi
 
 systemctl daemon-reload
 systemctl enable kanasa-wg
@@ -97,4 +137,5 @@ for _ in {1..10}; do
 done
 
 echo "❌ Health check failed"
+journalctl -u kanasa-wg --no-pager -n 20
 exit 1
