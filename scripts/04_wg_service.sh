@@ -13,6 +13,43 @@ if [[ -z "${KANASA_SERVER_KEY:-}" ]]; then
 fi
 
 # ─────────────────────────────────────────────────────────────
+# WG PORT (DEFAULT = 9000)
+# ─────────────────────────────────────────────────────────────
+KANASA_WG_PORT="${KANASA_WG_PORT:-9000}"
+
+# Validate port number
+if ! [[ "$KANASA_WG_PORT" =~ ^[0-9]+$ ]] || (( KANASA_WG_PORT < 1 || KANASA_WG_PORT > 65535 )); then
+  echo "❌ Invalid KANASA_WG_PORT: $KANASA_WG_PORT"
+  echo "👉 Port must be a number between 1 and 65535"
+  exit 1
+fi
+
+
+# ─────────────────────────────────────────────────────────────
+# CHECK PORT AVAILABILITY
+# ─────────────────────────────────────────────────────────────
+echo "🔍 Checking availability of port $KANASA_WG_PORT..."
+
+if ss -lnt "( sport = :$KANASA_WG_PORT )" | grep -q LISTEN; then
+  echo ""
+  echo "❌❌❌ PORT CONFLICT DETECTED ❌❌❌"
+  echo ""
+  echo "Port $KANASA_WG_PORT is already in use on this VPS."
+  echo ""
+  echo "👉 Please choose another port and re-run:"
+  echo ""
+  echo "   export KANASA_SERVER_KEY=${KANASA_SERVER_KEY}"
+  echo "   export KANASA_WG_PORT=<FREE_PORT>"
+  echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa-vps-setup/main/run.sh | bash"
+  echo ""
+  exit 1
+fi
+
+echo "✔ Port $KANASA_WG_PORT is free"
+
+
+
+# ─────────────────────────────────────────────────────────────
 # PATHS
 # ─────────────────────────────────────────────────────────────
 SERVICE_DIR="/opt/kanasa-wg"
@@ -53,9 +90,11 @@ rm -f "$tmp_binary"
 echo "🔐 Writing environment file..."
 cat > "$ENV_PATH" <<EOF
 KANASA_SERVER_KEY=${KANASA_SERVER_KEY}
+KANASA_WG_PORT=${KANASA_WG_PORT}
 EOF
 
 chmod 600 "$ENV_PATH"
+
 
 # ─────────────────────────────────────────────────────────────
 # INSTALL SYSTEMD SERVICE
@@ -72,8 +111,8 @@ systemctl restart kanasa-wg
 # ─────────────────────────────────────────────────────────────
 echo "🔍 Checking service health..."
 for _ in {1..10}; do
-  if curl -fsS http://127.0.0.1:9000/health >/dev/null 2>&1 \
-     || wget -q --spider http://127.0.0.1:9000/health; then
+  if curl -fsS http://127.0.0.1:${KANASA_WG_PORT}/health >/dev/null 2>&1 \
+     || wget -q --spider http://127.0.0.1:${KANASA_WG_PORT}/health; then
     echo "✔ Kanasa WG service ready"
     exit 0
   fi
@@ -82,3 +121,4 @@ done
 
 echo "❌ Health check failed"
 exit 1
+
