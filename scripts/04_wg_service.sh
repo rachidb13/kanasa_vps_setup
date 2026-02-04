@@ -72,30 +72,7 @@ mkdir -p "$SERVICE_DIR"
 echo "⬇️ Downloading kanasa-wg binary..."
 tmp_binary="$(mktemp)"
 
-if command -v wget >/dev/null 2>&1; then
-  wget -q -O "$tmp_binary" "$BINARY_URL"
-elif command -v curl >/dev/null 2>&1; then
-  curl -fsSL -o "$tmp_binary" "$BINARY_URL"
-else
-  echo "❌ curl or wget is required to download kanasa-wg"
-  exit 1
-fi
-
-install -m 0755 "$tmp_binary" "$BINARY_PATH"
-rm -f "$tmp_binary"
-
-# ─────────────────────────────────────────────────────────────
-# WRITE ENV FILE
-# ─────────────────────────────────────────────────────────────
-echo "🔐 Writing environment file..."
-cat > "$ENV_PATH" <<EOF
-KANASA_SERVER_KEY=${KANASA_SERVER_KEY}
-KANASA_WG_PORT=${KANASA_WG_PORT}
-EOF
-
-chmod 600 "$ENV_PATH"
-
-
+@@ -99,26 +53,25 @@ chmod 600 "$ENV_PATH"
 # ─────────────────────────────────────────────────────────────
 # INSTALL SYSTEMD SERVICE
 # ─────────────────────────────────────────────────────────────
@@ -121,4 +98,3 @@ done
 
 echo "❌ Health check failed"
 exit 1
-
