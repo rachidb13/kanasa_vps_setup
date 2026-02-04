@@ -64,3 +64,55 @@ run_step "Firewall setup" "$SCRIPT_DIR/scripts/05_firewall.sh"
 
 echo ""
 echo "✅ Kanasa VPS setup completed successfully"
+
+# ==========================================
+# Server Registration Payload Generation
+# ==========================================
+echo ""
+echo "🔍 Gathering server details..."
+
+# 1. Detect Public IP (Endpoint)
+ENDPOINT=$(curl -s https://api.ipify.org || echo "UNKNOWN")
+
+# 2. Detect Geo Location (Country/City)
+# Using ip-api csv format to avoid JSON parsing dependencies
+if [[ "$ENDPOINT" != "UNKNOWN" ]]; then
+  GEO_DATA=$(curl -s "http://ip-api.com/csv/${ENDPOINT}?fields=country,city" || echo "UNKNOWN,UNKNOWN")
+  # Remove carriage returns just in case
+  GEO_DATA=$(echo "$GEO_DATA" | tr -d '\r')
+  COUNTRY=$(echo "$GEO_DATA" | cut -d',' -f1)
+  CITY=$(echo "$GEO_DATA" | cut -d',' -f2)
+else
+  COUNTRY="UNKNOWN"
+  CITY="UNKNOWN"
+fi
+
+# Fallback checks for empty strings
+[[ -z "$COUNTRY" ]] && COUNTRY="UNKNOWN"
+[[ -z "$CITY" ]] && CITY="UNKNOWN"
+
+# 3. Get WireGuard Public Key
+WG_PUB_KEY=$(wg show wg0 public-key 2>/dev/null || echo "UNKNOWN")
+
+# 4. Construct Agent URL
+AGENT_URL="http://${ENDPOINT}:${KANASA_WG_PORT}"
+
+echo ""
+echo "========================================================"
+echo "       📝 SERVER REGISTRATION PAYLOAD 📝"
+echo "========================================================"
+echo "Copy the JSON block below and paste it into the admin panel:"
+echo ""
+cat <<EOF
+{
+  "server_key": "${KANASA_SERVER_KEY}",
+  "country": "${COUNTRY}",
+  "city": "${CITY}",
+  "endpoint": "${ENDPOINT}",
+  "agent_url": "${AGENT_URL}",
+  "public_key": "${WG_PUB_KEY}",
+  "listen_port": ${KANASA_WG_PORT}
+}
+EOF
+echo ""
+echo "========================================================"
