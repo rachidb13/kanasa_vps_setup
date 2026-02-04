@@ -29,6 +29,22 @@ if [[ -z "${KANASA_SERVER_KEY:-}" ]]; then
   exit 1
 fi
 
+# ==========================================
+# 🆕 SUBNET VALIDATION
+# ==========================================
+# If wg0 configuration is missing, we are bootstrapping a new node.
+# We MUST have a subnet to proceed.
+if [[ ! -f "/etc/wireguard/wg0.conf" ]]; then
+  if [[ -z "${KANASA_WG_SUBNET:-}" ]]; then
+    echo "❌ KANASA_WG_SUBNET is required for new server installations"
+    echo "👉 Example:"
+    echo "   export KANASA_SERVER_KEY=${KANASA_SERVER_KEY:-usa-1}"
+    echo "   export KANASA_WG_SUBNET=10.20.20.0/24"
+    echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa-vps-setup/main/run.sh | bash"
+    exit 1
+  fi
+fi
+
 KANASA_WG_PORT="${KANASA_WG_PORT:-9000}"
 
 if ! [[ "$KANASA_WG_PORT" =~ ^[0-9]+$ ]] || (( KANASA_WG_PORT < 1 || KANASA_WG_PORT > 65535 )); then
@@ -56,6 +72,7 @@ echo "✔ Port $KANASA_WG_PORT is free"
 
 export KANASA_SERVER_KEY
 export KANASA_WG_PORT
+export KANASA_WG_SUBNET
 
 run_step "Environment check" "$SCRIPT_DIR/scripts/01_check_env.sh"
 run_step "WireGuard install" "$SCRIPT_DIR/scripts/02_wireguard.sh"
@@ -91,8 +108,36 @@ fi
 [[ -z "$COUNTRY" ]] && COUNTRY="UNKNOWN"
 [[ -z "$CITY" ]] && CITY="UNKNOWN"
 
-# 3. Get WireGuard Public Key
-WG_PUB_KEY=$(wg show wg0 public-key 2>/dev/null || echo "UNKNOWN")
+# 3. Get WireGuard Public Key (Robust Detection)
+WG_PUB_KEY=""
+
+# Method A: Ask running WireGuard interface
+if [[ -z "$WG_PUB_KEY" ]]; then
+  WG_PUB_KEY=$(wg show wg0 public-key 2>/dev/null || true)
+fi
+
+# Method B: Read standard public key file
+if [[ -z "$WG_PUB_KEY" ]] && [[ -f "/etc/wireguard/publickey" ]]; then
+  WG_PUB_KEY=$(cat /etc/wireguard/publickey)
+fi
+
+# Method C: Derive from private key file
+if [[ -z "$WG_PUB_KEY" ]] && [[ -f "/etc/wireguard/privatekey" ]]; then
+  WG_PUB_KEY=$(wg pubkey < /etc/wireguard/privatekey)
+fi
+
+# Method D: Extract from wg0.conf and derive
+if [[ -z "$WG_PUB_KEY" ]] && [[ -f "/etc/wireguard/wg0.conf" ]]; then
+  # Extract PrivateKey value, ignoring whitespace
+  CONF_PRIV_KEY=$(grep "^PrivateKey" /etc/wireguard/wg0.conf | cut -d '=' -f2 | tr -d '[:space:]')
+  if [[ -n "$CONF_PRIV_KEY" ]]; then
+    WG_PUB_KEY=$(echo "$CONF_PRIV_KEY" | wg pubkey)
+  fi
+fi
+
+# Fallback if all fail
+[[ -z "$WG_PUB_KEY" ]] && WG_PUB_KEY="UNKNOWN"
+
 
 # 4. Construct Agent URL
 AGENT_URL="http://${ENDPOINT}:${KANASA_WG_PORT}"
