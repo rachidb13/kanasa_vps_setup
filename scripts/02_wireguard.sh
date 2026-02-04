@@ -12,10 +12,26 @@ else
   DEBIAN_FRONTEND=noninteractive apt-get install -y wireguard wireguard-tools iptables
 fi
 
+# 2. Enable IP Forwarding (Critical for VPN routing)
+echo "🌐 Enabling IPv4 forwarding..."
+
+# Persist settings to a dedicated file to avoid conflicts
+echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/99-kanasa.conf
+
+# Apply settings immediately
+sysctl -p /etc/sysctl.d/99-kanasa.conf > /dev/null
+
+# Strict Verification
+if [[ "$(sysctl -n net.ipv4.ip_forward)" != "1" ]]; then
+  echo "❌ Failed to enable IP forwarding"
+  exit 1
+fi
+echo "✔ net.ipv4.ip_forward = 1"
+
 mkdir -p /etc/wireguard
 chmod 700 /etc/wireguard
 
-# 2. Idempotency Check: If wg0.conf exists, we assume this VPS is already configured.
+# 3. Idempotency Check: If wg0.conf exists, we assume this VPS is already configured.
 if [[ -f "/etc/wireguard/wg0.conf" ]]; then
   echo "✔ WireGuard configuration already exists. Skipping bootstrap."
 
@@ -30,7 +46,7 @@ if [[ -f "/etc/wireguard/wg0.conf" ]]; then
   exit 0
 fi
 
-# 3. Bootstrap Logic for New Installs
+# 4. Bootstrap Logic for New Installs
 echo "⚙️ Bootstrapping WireGuard interface..."
 
 # Validate Subnet (passed from run.sh)
@@ -74,12 +90,12 @@ EOF
 chmod 600 /etc/wireguard/wg0.conf
 echo "✔ Created /etc/wireguard/wg0.conf"
 
-# 4. Enable and Start
+# 5. Enable and Start
 echo "🚀 Starting WireGuard..."
 systemctl enable wg-quick@wg0
 systemctl restart wg-quick@wg0
 
-# 5. Verification
+# 6. Verification
 if wg show wg0 >/dev/null 2>&1; then
   echo "✔ WireGuard interface (wg0) is UP"
 else
