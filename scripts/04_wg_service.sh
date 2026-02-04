@@ -83,8 +83,10 @@ fi
 # CREATE CONFIGURATION
 # ─────────────────────────────────────────────────────────────
 echo "📝 Creating configuration..."
+# We explicitly set both PORT and KANASA_WG_PORT to ensure the binary picks it up
 cat <<EOF > "$ENV_PATH"
 PORT=${KANASA_WG_PORT}
+KANASA_WG_PORT=${KANASA_WG_PORT}
 KANASA_SERVER_KEY=${KANASA_SERVER_KEY}
 EOF
 chmod 600 "$ENV_PATH"
@@ -127,9 +129,10 @@ systemctl restart kanasa-wg
 # HEALTH CHECK
 # ─────────────────────────────────────────────────────────────
 echo "🔍 Checking service health..."
+# Wait up to 10 seconds for the service to bind to the port
 for _ in {1..10}; do
-  if curl -fsS http://127.0.0.1:${KANASA_WG_PORT}/health >/dev/null 2>&1 \
-     || wget -q --spider http://127.0.0.1:${KANASA_WG_PORT}/health; then
+  if curl -fsS "http://127.0.0.1:${KANASA_WG_PORT}/health" >/dev/null 2>&1 \
+     || wget -q --spider "http://127.0.0.1:${KANASA_WG_PORT}/health"; then
     echo "✔ Kanasa WG service ready"
     exit 0
   fi
@@ -137,5 +140,6 @@ for _ in {1..10}; do
 done
 
 echo "❌ Health check failed"
+echo "👉 Logs:"
 journalctl -u kanasa-wg --no-pager -n 20
 exit 1
