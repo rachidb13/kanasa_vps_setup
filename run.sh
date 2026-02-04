@@ -59,7 +59,6 @@ export KANASA_WG_PORT
 
 run_step "Environment check" "$SCRIPT_DIR/scripts/01_check_env.sh"
 run_step "WireGuard install" "$SCRIPT_DIR/scripts/02_wireguard.sh"
-run_step "Go install" "$SCRIPT_DIR/scripts/03_go.sh"
 run_step "Kanasa WG service" "$SCRIPT_DIR/scripts/04_wg_service.sh"
 run_step "Firewall setup" "$SCRIPT_DIR/scripts/05_firewall.sh"
 
