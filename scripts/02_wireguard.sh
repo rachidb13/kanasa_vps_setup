@@ -102,4 +102,4 @@ else
   exit 1
 fi
 
-echo "✔ WireGuard ready"
+echo " ✔ WireGuard ready "
