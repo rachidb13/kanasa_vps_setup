@@ -18,7 +18,7 @@ if [[ ! -d "scripts-silent" ]]; then
   cd "$TMP_DIR/kanasa_vps_setup-001-silent-installer-mode"
 fi
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && p
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/scripts-silent/00_common_silent.sh"
 
 
@@ -176,7 +176,10 @@ cat <<EOF
 EOF
 
 echo ""
-echo "================================================wrfgwergf# ─────────────────────────────────────────────────────────────
+echo "========================================================"
+echo ""
+
+# ─────────────────────────────────────────────────────────────
 # AUTO-REGISTER: POST payload to admin panel
 # ─────────────────────────────────────────────────────────────
 REGISTER_URL="https://admin.kanasavpn.com/server_register_demo.php"
