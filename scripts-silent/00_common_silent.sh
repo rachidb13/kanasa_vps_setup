@@ -125,10 +125,16 @@ run_step() {
     # Interactive — spinner + cover message
     local _log="/tmp/kanasa_step_${_STEP_CURRENT}.log"
     _start_spinner "$cover_msg"
+
+    # Temporarily disable ERR trap while running step
+    trap - ERR
     set +e
     bash "$script" > "$_log" 2>&1
     local rc=$?
     set -e
+    # Re-enable ERR trap
+    trap '_silent_cleanup' ERR
+
     if [[ $rc -ne 0 ]]; then
       _stop_spinner false
       echo "❌ Setup failed — please check your configuration"
@@ -141,10 +147,16 @@ run_step() {
     # Piped — line-based progress
     local _log="/tmp/kanasa_step_${_STEP_CURRENT}.log"
     printf "Step %d/%d: %s..." "$_STEP_CURRENT" "$_STEP_TOTAL" "$cover_msg"
+
+    # Temporarily disable ERR trap while running step
+    trap - ERR
     set +e
     bash "$script" > "$_log" 2>&1
     local rc=$?
     set -e
+    # Re-enable ERR trap
+    trap '_silent_cleanup' ERR
+
     if [[ $rc -ne 0 ]]; then
       echo "FAILED"
       echo "❌ Setup failed — please check your configuration"

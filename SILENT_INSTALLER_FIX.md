@@ -1,6 +1,6 @@
 # Silent Installer Fix Summary
 
-## Problem
+## Problem 1: Premature Exit (FIXED)
 
 The silent installer was stopping prematurely after showing the first step completion, displaying:
 
@@ -10,12 +10,23 @@ The silent installer was stopping prematurely after showing the first step compl
 
 And then immediately returning to the command prompt without completing the installation.
 
+## Problem 2: False Error Messages (FIXED)
+
+After the first fix, the installer was showing error messages during normal operation:
+
+```
+✔ Done   ⠋ 🏳️ Downloading flag asset pack... ❌ Setup failed — an unexpected error occurred
+```
+
+Even though the steps were completing successfully and the final JSON payload was displayed.
+
 ## Root Causes Identified
 
 1. **Duplicate trap registration** - Both `00_common_silent.sh` and `run-silent.sh` were registering traps, causing conflicts
 2. **EXIT trap firing prematurely** - The trap was configured to run on EXIT, which was triggering even during normal script flow
 3. **stdin redirection conflict** - Using `</dev/null` in script execution was causing issues when the installer runs via `curl | bash`
 4. **Spinner cleanup timing** - The spinner was not being properly cleared before showing final output
+5. **ERR trap false positives** - The ERR trap was firing during normal error handling in `run_step`, causing false error messages
 
 ## Fixes Applied
 
@@ -26,6 +37,10 @@ And then immediately returning to the command prompt without completing the inst
 - Modified trap to only catch `ERR INT TERM` instead of `EXIT INT TERM PIPE`
   - This prevents the trap from firing during normal script completion
   - Only catches actual errors and user interrupts
+- **Added trap disable/enable around step execution** to prevent false error messages
+  - Disables ERR trap before running each step
+  - Re-enables after checking the exit code
+  - This prevents the trap from firing when we're handling errors properly
 - Added `_clear_spinner()` helper function for explicit spinner cleanup
 - Removed `</dev/null` stdin redirection from bash script execution
   - This was conflicting with `curl | bash` execution model
@@ -42,7 +57,14 @@ bash "$script" > "$_log" 2>&1 </dev/null
 ```bash
 set -eE  # Exit on error, inherit ERR trap
 trap '_silent_cleanup' ERR INT TERM
+
+# In run_step function:
+trap - ERR  # Disable trap during step execution
+set +e
 bash "$script" > "$_log" 2>&1
+local rc=$?
+set -e
+trap '_silent_cleanup' ERR  # Re-enable trap
 ```
 
 ### 2. Fixed `run-silent.sh`
