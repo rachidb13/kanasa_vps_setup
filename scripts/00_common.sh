@@ -138,7 +138,7 @@ run_step() {
       # Silent interactive — spinner + cover message
       _start_spinner "$cover_msg"
       set +e
-      bash "$script" > /dev/null 2>&1
+      bash "$script" < /dev/null > /dev/null 2>&1
       local rc=$?
       set -e
       if [[ $rc -ne 0 ]]; then
@@ -152,7 +152,7 @@ run_step() {
       # Silent piped — line-based progress
       printf "Step %d/%d: %s..." "$_STEP_CURRENT" "$_STEP_TOTAL" "$cover_msg"
       set +e
-      bash "$script" > /dev/null 2>&1
+      bash "$script" < /dev/null > /dev/null 2>&1
       local rc=$?
       set -e
       if [[ $rc -ne 0 ]]; then

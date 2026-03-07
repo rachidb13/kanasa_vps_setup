@@ -37,9 +37,9 @@ source "$SCRIPT_DIR/scripts/00_common.sh"
 # Must re-register trap to chain with the TMP_DIR cleanup above.
 # ─────────────────────────────────────────────────────────────
 if [[ -n "${TMP_DIR:-}" ]]; then
-  trap '_silent_cleanup; rm -rf "$TMP_DIR"' EXIT
+  trap '_silent_cleanup; rm -rf "$TMP_DIR"' EXIT INT TERM PIPE
 else
-  trap '_silent_cleanup' EXIT
+  trap '_silent_cleanup' EXIT INT TERM PIPE
 fi
 
 # ─────────────────────────────────────────────────────────────

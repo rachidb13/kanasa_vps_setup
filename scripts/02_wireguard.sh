@@ -9,7 +9,7 @@ if command -v wg >/dev/null 2>&1; then
 else
   echo "📦 Installing WireGuard..."
   apt-get update -qq
-  DEBIAN_FRONTEND=noninteractive apt-get install -y wireguard wireguard-tools iptables
+  DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y wireguard wireguard-tools iptables
 fi
 
 # 2. Enable IP Forwarding (Critical for VPN routing)
