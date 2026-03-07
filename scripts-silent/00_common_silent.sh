@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 set -eE
 if [[ $EUID -ne 0 ]]; then
   echo "Please run as root (sudo)" >&2
