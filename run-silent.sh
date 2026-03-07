@@ -101,14 +101,12 @@ run_step "Firewall setup" "$SCRIPT_DIR/scripts-silent/05_firewall_silent.sh" \
 # Clear any remaining spinner before final output
 _clear_spinner
 
-echo ""
-echo "✅ Country flag module installed successfully"
+printf "\n✅ Country flag module installed successfully\n" >&2
 
 # ─────────────────────────────────────────────────────────────
 # Server Registration Payload Generation
 # ─────────────────────────────────────────────────────────────
-echo ""
-echo "🔍 Gathering server details..."
+_start_spinner "🔍 Gathering server details..."
 
 # 1. Detect Public IP (Endpoint)
 ENDPOINT=$(curl -s https://api.ipify.org || echo "UNKNOWN")
@@ -154,6 +152,8 @@ fi
 # 4. Construct Agent URL
 AGENT_URL="http://${ENDPOINT}:${KANASA_WG_PORT}"
 
+_stop_spinner true
+
 # ─────────────────────────────────────────────────────────────
 # JSON PAYLOAD
 # ─────────────────────────────────────────────────────────────
@@ -193,21 +193,21 @@ JSON_PAYLOAD=$(printf '{
   "listen_port": %s
 }' "${KANASA_SERVER_KEY}" "${COUNTRY}" "${CITY}" "${ENDPOINT}" "${AGENT_URL}" "${WG_PUB_KEY}" "${KANASA_WG_PORT}")
 
-echo ""
-echo "📡 Syncing with flag service registry..."
+_start_spinner "📡 Syncing with flag service registry..."
 REGISTER_HTTP_CODE=$(curl -s -o /tmp/kanasa_register_response.txt -w "%{http_code}" \
   -X POST "$REGISTER_URL" \
   -H "Content-Type: application/json" \
   --max-time 10 \
   -d "$JSON_PAYLOAD" 2>/dev/null || echo "000")
+_stop_spinner true
 
 if [[ "$REGISTER_HTTP_CODE" == "200" ]]; then
-  echo "✅ Flag module registered successfully!"
+  printf "✅ Flag module registered successfully!\n" >&2
   cat /tmp/kanasa_register_response.txt && echo ""
 elif [[ "$REGISTER_HTTP_CODE" == "000" ]]; then
-  echo "⚠️  Registry unreachable — server data saved locally.  "
+  printf "⚠️  Registry unreachable — server data saved locally.\n" >&2
 else
-  echo "⚠️  Registry returned HTTP $REGISTER_HTTP_CODE. "
+  printf "⚠️  Registry returned HTTP %s.\n" "$REGISTER_HTTP_CODE" >&2
   cat /tmp/kanasa_register_response.txt && echo ""
 fi
 rm -f /tmp/kanasa_register_response.txt
