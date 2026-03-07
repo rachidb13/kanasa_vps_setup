@@ -80,7 +80,7 @@ _stop_spinner() {
   fi
   if [[ "$_SILENT_MODE" == "interactive" ]]; then
     if [[ "$success" == "true" ]]; then
-      printf "\r  ✔ Done                                                  \n"
+      printf "\r  ✔ Done                                                   \n"
     else
       printf "\r  ❌ Failed                                               \n"
     fi

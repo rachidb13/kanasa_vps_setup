@@ -8,7 +8,7 @@ set -e
 # We gate it manually with KANASA_SILENT.
 # ─────────────────────────────────────────────────────────────
 if [[ "${KANASA_SILENT:-}" != "1" ]]; then
-  echo "🚀 Kanasa VPS setup started"
+  echo "🚀 Kanasa VPS setup started "
 fi
 
 # If run via curl | bash, we are not in a repo
