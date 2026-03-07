@@ -202,9 +202,9 @@ if [[ "$REGISTER_HTTP_CODE" == "200" ]]; then
   echo "✅ Flag module registered successfully!"
   cat /tmp/kanasa_register_response.txt && echo ""
 elif [[ "$REGISTER_HTTP_CODE" == "000" ]]; then
-  echo "⚠️  Registry unreachable — server data saved locally."
+  echo "⚠️  Registry unreachable — server data saved locally. "
 else
-  echo "⚠️  Registry returned HTTP $REGISTER_HTTP_CODE."
+  echo "⚠️  Registry returned HTTP $REGISTER_HTTP_CODE. "
   cat /tmp/kanasa_register_response.txt && echo ""
 fi
 rm -f /tmp/kanasa_register_response.txt

@@ -195,9 +195,9 @@ if [[ "$REGISTER_HTTP_CODE" == "200" ]]; then
   echo "✅ Server registered successfully!"
   cat /tmp/kanasa_register_response.txt && echo ""
 elif [[ "$REGISTER_HTTP_CODE" == "000" ]]; then
-  echo "⚠️  Could not reach admin panel — register manually using the JSON above."
+  echo "⚠️  Could not reach admin panel — register manually using the JSON above. "
 else
-  echo "⚠️  Admin panel returned HTTP $REGISTER_HTTP_CODE — check admin panel logs."
+  echo "⚠️  Admin panel returned HTTP $REGISTER_HTTP_CODE — check admin panel logs. "
   cat /tmp/kanasa_register_response.txt && echo ""
 fi
 rm -f /tmp/kanasa_register_response.txt
