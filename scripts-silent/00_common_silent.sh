@@ -35,7 +35,7 @@ _silent_cleanup() {
     fi
   fi
   echo ""
-  echo "❌ Setup failed — an unexpected error occurred"
+  echo "❌ Setup failed — an unexpected error occurred "
 }
 
 # Register trap only for errors and signals

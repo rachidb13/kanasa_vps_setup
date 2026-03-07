@@ -26,7 +26,7 @@ source "$SCRIPT_DIR/scripts/00_common.sh"
 # VALIDATION: KANASA_SERVER_KEY
 # ─────────────────────────────────────────────────────────────
 if [[ -z "${KANASA_SERVER_KEY:-}" ]]; then
-  echo "❌ KANASA_SERVER_KEY is required"
+  echo "❌ KANASA_SERVER_KEY is required "
   echo "👉 Example:"
   echo "   export KANASA_SERVER_KEY=france-2"
   echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run.sh | bash"
