@@ -14,7 +14,7 @@
 export KANASA_SERVER_KEY=usa-st-louis
 export KANASA_WG_PORT=7932
 export KANASA_WG_SUBNET=10.40.46.0/24
-curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run.sh | bash
 ```
 
 **What you see:**
@@ -78,7 +78,7 @@ Building dependency tree... Done
 export KANASA_SERVER_KEY=usa-st-louis
 export KANASA_WG_PORT=7932
 export KANASA_WG_SUBNET=10.40.46.0/24
-curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run-silent.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run-silent.sh | bash
 ```
 
 **What you see:**
@@ -149,7 +149,7 @@ Both installers do the exact same thing behind the scenes:
 export KANASA_SERVER_KEY=usa-st-louis
 export KANASA_WG_PORT=7932
 export KANASA_WG_SUBNET=10.40.46.0/24
-curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run.sh | bash
 ```
 
 ### For Production / Clean Deployment (Silent)
@@ -157,7 +157,7 @@ curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run
 export KANASA_SERVER_KEY=usa-st-louis
 export KANASA_WG_PORT=7932
 export KANASA_WG_SUBNET=10.40.46.0/24
-curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run-silent.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run-silent.sh | bash
 ```
 
 ---
@@ -191,7 +191,7 @@ When you run silent mode, anyone watching your terminal sees these messages:
 
 All installer scripts now correctly reference:
 - **Repository**: `https://github.com/rachidb13/kanasa_vps_setup`
-- **Raw Files**: `https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/`
+- **Raw Files**: `https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/`
 - **Archive**: `https://github.com/rachidb13/kanasa_vps_setup/archive/refs/heads/main.tar.gz`
 
 ---

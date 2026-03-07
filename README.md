@@ -12,7 +12,7 @@ Full installation logs with detailed step-by-step output:
 export KANASA_SERVER_KEY=usa-st-louis
 export KANASA_WG_PORT=7932
 export KANASA_WG_SUBNET=10.40.46.0/24
-curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run.sh | bash
 ```
 
 ### Silent Mode (Minimal Output)
@@ -23,7 +23,7 @@ Clean installation with progress spinner and minimal output. Perfect for product
 export KANASA_SERVER_KEY=usa-st-louis
 export KANASA_WG_PORT=7932
 export KANASA_WG_SUBNET=10.40.46.0/24
-curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run-silent.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run-silent.sh | bash
 ```
 
 ## Project Structure

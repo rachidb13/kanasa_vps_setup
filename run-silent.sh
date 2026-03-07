@@ -12,10 +12,10 @@ if [[ ! -d "scripts-silent" ]]; then
   trap 'rm -rf "$TMP_DIR"' EXIT
 
   curl -fsSL \
-    https://github.com/rachidb13/kanasa_vps_setup/archive/refs/heads/main.tar.gz \
+    https://github.com/rachidb13/kanasa_vps_setup/archive/refs/heads/001-silent-installer-mode.tar.gz \
     | tar -xz -C "$TMP_DIR"
 
-  cd "$TMP_DIR/kanasa_vps_setup-main"
+  cd "$TMP_DIR/kanasa_vps_setup-001-silent-installer-mode"
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -38,7 +38,7 @@ if [[ -z "${KANASA_SERVER_KEY:-}" ]]; then
     "❌ KANASA_SERVER_KEY is required" \
     "👉 Example:" \
     "   export KANASA_SERVER_KEY=france-2" \
-    "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run-silent.sh | bash"
+    "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run-silent.sh | bash"
   exit 1
 fi
 
@@ -53,7 +53,7 @@ if [[ ! -f "/etc/wireguard/wg0.conf" ]]; then
       "👉 Example:" \
       "   export KANASA_SERVER_KEY=${KANASA_SERVER_KEY:-usa-1}" \
       "   export KANASA_WG_SUBNET=10.20.20.0/24" \
-      "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run-silent.sh | bash"
+      "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run-silent.sh | bash"
     exit 1
   fi
 fi
@@ -81,7 +81,7 @@ if ss -lnt "( sport = :$KANASA_WG_PORT )" | grep -q LISTEN; then
     "" \
     "   export KANASA_SERVER_KEY=${KANASA_SERVER_KEY}" \
     "   export KANASA_WG_PORT=<FREE_PORT>" \
-    "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run-silent.sh | bash" \
+    "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run-silent.sh | bash" \
     ""
   exit 1
 fi

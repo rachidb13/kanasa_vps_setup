@@ -14,7 +14,7 @@ Use this for **debugging** and **first-time setup**.
 export KANASA_SERVER_KEY=usa-st-louis
 export KANASA_WG_PORT=7932
 export KANASA_WG_SUBNET=10.40.46.0/24
-curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run.sh | bash
 ```
 
 **What you'll see:**
@@ -32,7 +32,7 @@ Use this for **production** and **clean deployment**.
 export KANASA_SERVER_KEY=usa-st-louis
 export KANASA_WG_PORT=7932
 export KANASA_WG_SUBNET=10.40.46.0/24
-curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run-silent.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run-silent.sh | bash
 ```
 
 **What you'll see:**
@@ -66,7 +66,7 @@ curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run
 export KANASA_SERVER_KEY=usa-st-louis
 export KANASA_WG_PORT=7932
 export KANASA_WG_SUBNET=10.40.46.0/24
-curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run-silent.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run-silent.sh | bash
 ```
 
 ### Basic Setup (France Server)
@@ -74,7 +74,7 @@ curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run
 export KANASA_SERVER_KEY=france-paris
 export KANASA_WG_PORT=8500
 export KANASA_WG_SUBNET=10.50.10.0/24
-curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run-silent.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run-silent.sh | bash
 ```
 
 ### Debug Mode (Verbose)
@@ -82,7 +82,7 @@ curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run
 export KANASA_SERVER_KEY=test-server
 export KANASA_WG_PORT=9000
 export KANASA_WG_SUBNET=10.10.10.0/24
-curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run.sh | bash
 ```
 
 ---
@@ -169,7 +169,7 @@ Port 7932 is already in use on this VPS.
 👉 Please choose another port and re-run:
    export KANASA_SERVER_KEY=usa-st-louis
    export KANASA_WG_PORT=<FREE_PORT>
-   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run.sh | bash
 ```
 
 **Solution**: Use a different port number.
@@ -180,7 +180,7 @@ Port 7932 is already in use on this VPS.
 
 👉 Example:
    export KANASA_SERVER_KEY=france-2
-   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run.sh | bash
 ```
 
 **Solution**: Set the server key before running.
