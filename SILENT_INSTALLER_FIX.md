@@ -37,10 +37,10 @@ Even though the steps were completing successfully and the final JSON payload wa
 - Modified trap to only catch `ERR INT TERM` instead of `EXIT INT TERM PIPE`
   - This prevents the trap from firing during normal script completion
   - Only catches actual errors and user interrupts
-- **Added trap disable/enable around step execution** to prevent false error messages
-  - Disables ERR trap before running each step
-  - Re-enables after checking the exit code
-  - This prevents the trap from firing when we're handling errors properly
+- **Isolated step execution in subshells to prevent ERR trap inheritance**
+  - Runs each step script in a subshell with `( set +eE; ... )`
+  - This completely isolates script execution from parent ERR trap
+  - Uses `|| rc=$?` to capture exit code without triggering trap
 - Added `_clear_spinner()` helper function for explicit spinner cleanup
 - Removed `</dev/null` stdin redirection from bash script execution
   - This was conflicting with `curl | bash` execution model
@@ -58,13 +58,10 @@ bash "$script" > "$_log" 2>&1 </dev/null
 set -eE  # Exit on error, inherit ERR trap
 trap '_silent_cleanup' ERR INT TERM
 
-# In run_step function:
-trap - ERR  # Disable trap during step execution
-set +e
-bash "$script" > "$_log" 2>&1
-local rc=$?
-set -e
-trap '_silent_cleanup' ERR  # Re-enable trap
+# In run_step function - isolate in subshell:
+local rc=0
+( set +eE; bash "$script" > "$_log" 2>&1 ) || rc=$?
+# Subshell completely isolates from parent ERR trap
 ```
 
 ### 2. Fixed `run-silent.sh`

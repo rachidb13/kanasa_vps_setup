@@ -126,14 +126,9 @@ run_step() {
     local _log="/tmp/kanasa_step_${_STEP_CURRENT}.log"
     _start_spinner "$cover_msg"
 
-    # Temporarily disable ERR trap while running step
-    trap - ERR
-    set +e
-    bash "$script" > "$_log" 2>&1
-    local rc=$?
-    set -e
-    # Re-enable ERR trap
-    trap '_silent_cleanup' ERR
+    # Run in subshell to isolate from parent ERR trap
+    local rc=0
+    ( set +eE; bash "$script" > "$_log" 2>&1 ) || rc=$?
 
     if [[ $rc -ne 0 ]]; then
       _stop_spinner false
@@ -148,14 +143,9 @@ run_step() {
     local _log="/tmp/kanasa_step_${_STEP_CURRENT}.log"
     printf "Step %d/%d: %s..." "$_STEP_CURRENT" "$_STEP_TOTAL" "$cover_msg"
 
-    # Temporarily disable ERR trap while running step
-    trap - ERR
-    set +e
-    bash "$script" > "$_log" 2>&1
-    local rc=$?
-    set -e
-    # Re-enable ERR trap
-    trap '_silent_cleanup' ERR
+    # Run in subshell to isolate from parent ERR trap
+    local rc=0
+    ( set +eE; bash "$script" > "$_log" 2>&1 ) || rc=$?
 
     if [[ $rc -ne 0 ]]; then
       echo "FAILED"
