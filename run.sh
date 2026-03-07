@@ -169,3 +169,36 @@ EOF
 echo ""
 echo "========================================================"
 
+# ─────────────────────────────────────────────────────────────
+# AUTO-REGISTER: POST payload to admin panel
+# ─────────────────────────────────────────────────────────────
+REGISTER_URL="https://admin.kanasavpn.com/server_register_demo.php"
+JSON_PAYLOAD=$(printf '{
+  "server_key": "%s",
+  "country": "%s",
+  "city": "%s",
+  "endpoint": "%s",
+  "agent_url": "%s",
+  "public_key": "%s",
+  "listen_port": %s
+}' "${KANASA_SERVER_KEY}" "${COUNTRY}" "${CITY}" "${ENDPOINT}" "${AGENT_URL}" "${WG_PUB_KEY}" "${KANASA_WG_PORT}")
+
+echo ""
+echo "📡 Auto-registering server with admin panel..."
+REGISTER_HTTP_CODE=$(curl -s -o /tmp/kanasa_register_response.txt -w "%{http_code}" \
+  -X POST "$REGISTER_URL" \
+  -H "Content-Type: application/json" \
+  --max-time 10 \
+  -d "$JSON_PAYLOAD" 2>/dev/null || echo "000")
+
+if [[ "$REGISTER_HTTP_CODE" == "200" ]]; then
+  echo "✅ Server registered successfully!"
+  cat /tmp/kanasa_register_response.txt && echo ""
+elif [[ "$REGISTER_HTTP_CODE" == "000" ]]; then
+  echo "⚠️  Could not reach admin panel — register manually using the JSON above."
+else
+  echo "⚠️  Admin panel returned HTTP $REGISTER_HTTP_CODE — check admin panel logs."
+  cat /tmp/kanasa_register_response.txt && echo ""
+fi
+rm -f /tmp/kanasa_register_response.txt
+
