@@ -22,12 +22,6 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 source "$SCRIPT_DIR/scripts-silent/00_common_silent.sh"
 
-# Re-register trap for cleanup
-if [[ -n "${TMP_DIR:-}" ]]; then
-  trap '_silent_cleanup; rm -rf "$TMP_DIR"' EXIT INT TERM PIPE
-else
-  trap '_silent_cleanup' EXIT INT TERM PIPE
-fi
 
 # ─────────────────────────────────────────────────────────────
 # VALIDATION: KANASA_SERVER_KEY
@@ -104,6 +98,9 @@ run_step "Kanasa WG service" "$SCRIPT_DIR/scripts-silent/04_wg_service_silent.sh
 
 run_step "Firewall setup" "$SCRIPT_DIR/scripts-silent/05_firewall_silent.sh" \
   "✨ Finalizing country detection module..."
+
+# Clear any remaining spinner before final output
+_clear_spinner
 
 echo ""
 echo "✅ Country flag module installed successfully"

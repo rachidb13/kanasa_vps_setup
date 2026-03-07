@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -eE  # Exit on error, inherit ERR trap
 
 if [[ $EUID -ne 0 ]]; then
   echo "❌ Please run as root (sudo)"
@@ -20,6 +20,26 @@ if [[ -t 1 ]]; then
 else
   _INTERACTIVE="false"
 fi
+
+# ─────────────────────────────────────────────────────────────
+# HELPER: _silent_cleanup — trap handler for errors
+# ─────────────────────────────────────────────────────────────
+_silent_cleanup() {
+  if [[ -n "${_SPINNER_PID:-}" ]]; then
+    kill "$_SPINNER_PID" 2>/dev/null || true
+    wait "$_SPINNER_PID" 2>/dev/null || true
+    _SPINNER_PID=""
+    # Clear the spinner line
+    if [[ "$_INTERACTIVE" == "true" ]]; then
+      printf "\r%60s\r" " "
+    fi
+  fi
+  echo ""
+  echo "❌ Setup failed — an unexpected error occurred"
+}
+
+# Register trap only for errors and signals
+trap '_silent_cleanup' ERR INT TERM
 
 # ─────────────────────────────────────────────────────────────
 # HELPER: _error — display error and exit
@@ -57,7 +77,7 @@ _start_spinner() {
 _stop_spinner() {
   local success="${1:-true}"
   if [[ -n "${_SPINNER_PID:-}" ]]; then
-    kill "$_SPINNER_PID" 2>/dev/null
+    kill "$_SPINNER_PID" 2>/dev/null || true
     wait "$_SPINNER_PID" 2>/dev/null || true
     _SPINNER_PID=""
   fi
@@ -71,20 +91,19 @@ _stop_spinner() {
 }
 
 # ─────────────────────────────────────────────────────────────
-# HELPER: _silent_cleanup — trap handler
+# HELPER: _clear_spinner — stop spinner without showing status
 # ─────────────────────────────────────────────────────────────
-_silent_cleanup() {
-  local exit_code=$?
+_clear_spinner() {
   if [[ -n "${_SPINNER_PID:-}" ]]; then
-    kill "$_SPINNER_PID" 2>/dev/null
+    kill "$_SPINNER_PID" 2>/dev/null || true
     wait "$_SPINNER_PID" 2>/dev/null || true
     _SPINNER_PID=""
-  fi
-  if [[ $exit_code -ne 0 ]]; then
-    echo ""
-    echo "❌ Setup failed — an unexpected error occurred"
+    if [[ "$_INTERACTIVE" == "true" ]]; then
+      printf "\r%60s\r" " "
+    fi
   fi
 }
+
 
 # ─────────────────────────────────────────────────────────────
 # MAIN: run_step — silent step runner with spinner
@@ -107,7 +126,7 @@ run_step() {
     local _log="/tmp/kanasa_step_${_STEP_CURRENT}.log"
     _start_spinner "$cover_msg"
     set +e
-    bash "$script" > "$_log" 2>&1 </dev/null
+    bash "$script" > "$_log" 2>&1
     local rc=$?
     set -e
     if [[ $rc -ne 0 ]]; then
@@ -123,7 +142,7 @@ run_step() {
     local _log="/tmp/kanasa_step_${_STEP_CURRENT}.log"
     printf "Step %d/%d: %s..." "$_STEP_CURRENT" "$_STEP_TOTAL" "$cover_msg"
     set +e
-    bash "$script" > "$_log" 2>&1 </dev/null
+    bash "$script" > "$_log" 2>&1
     local rc=$?
     set -e
     if [[ $rc -ne 0 ]]; then
