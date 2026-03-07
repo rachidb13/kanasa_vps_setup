@@ -11,10 +11,10 @@ if [[ ! -d "scripts" ]]; then
   trap 'rm -rf "$TMP_DIR"' EXIT
 
   curl -fsSL \
-    https://github.com/rachidb13/kanasa-vps-setup/archive/refs/heads/main.tar.gz \
+    https://github.com/rachidb13/kanasa_vps_setup/archive/refs/heads/main.tar.gz \
     | tar -xz -C "$TMP_DIR"
 
-  cd "$TMP_DIR/kanasa-vps-setup-main"
+  cd "$TMP_DIR/kanasa_vps_setup-main"
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -29,7 +29,7 @@ if [[ -z "${KANASA_SERVER_KEY:-}" ]]; then
   echo "❌ KANASA_SERVER_KEY is required"
   echo "👉 Example:"
   echo "   export KANASA_SERVER_KEY=france-2"
-  echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa-vps-setup/main/run.sh | bash"
+  echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run.sh | bash"
   exit 1
 fi
 
@@ -44,7 +44,7 @@ if [[ ! -f "/etc/wireguard/wg0.conf" ]]; then
     echo "👉 Example:"
     echo "   export KANASA_SERVER_KEY=${KANASA_SERVER_KEY:-usa-1}"
     echo "   export KANASA_WG_SUBNET=10.20.20.0/24"
-    echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa-vps-setup/main/run.sh | bash"
+    echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run.sh | bash"
     exit 1
   fi
 fi
@@ -68,7 +68,7 @@ if ss -lnt "( sport = :$KANASA_WG_PORT )" | grep -q LISTEN; then
   echo ""
   echo "   export KANASA_SERVER_KEY=${KANASA_SERVER_KEY}"
   echo "   export KANASA_WG_PORT=<FREE_PORT>"
-  echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa-vps-setup/main/run.sh | bash"
+  echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run.sh | bash"
   echo ""
   exit 1
 fi

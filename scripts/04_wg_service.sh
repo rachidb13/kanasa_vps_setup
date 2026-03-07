@@ -8,7 +8,7 @@ if [[ -z "${KANASA_SERVER_KEY:-}" ]]; then
   echo "❌ KANASA_SERVER_KEY is required"
   echo "👉 Example:"
   echo "   export KANASA_SERVER_KEY=france-2"
-  echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa-vps-setup/main/run.sh | bash"
+  echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run.sh | bash"
   exit 1
 fi
 
@@ -39,7 +39,7 @@ if ss -lnt "( sport = :$KANASA_WG_PORT )" | grep -q LISTEN; then
   echo ""
   echo "   export KANASA_SERVER_KEY=${KANASA_SERVER_KEY}"
   echo "   export KANASA_WG_PORT=<FREE_PORT>"
-  echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa-vps-setup/main/run.sh | bash"
+  echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/main/run.sh | bash"
   echo ""
   exit 1
 fi
