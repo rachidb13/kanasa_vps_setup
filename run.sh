@@ -8,13 +8,13 @@ set -e
 # We gate it manually with KANASA_SILENT.
 # ─────────────────────────────────────────────────────────────
 if [[ "${KANASA_SILENT:-}" != "1" ]]; then
-  echo "🚀 Kanasa VPS setup started "
+  echo "🚀 Kanasa VPS setup started — please wait..."
 fi
 
 # If run via curl | bash, we are not in a repo
 if [[ ! -d "scripts" ]]; then
   if [[ "${KANASA_SILENT:-}" != "1" ]]; then
-    echo "📦 Fetching Kanasa setup repository..."
+    echo "📦 Fetching Kanasa setup repository... "
   fi
 
   TMP_DIR="$(mktemp -d)"
