@@ -59,20 +59,25 @@ fi
 
 echo "🔍 Checking availability of port $KANASA_WG_PORT..."
 if ss -lnt "( sport = :$KANASA_WG_PORT )" | grep -q LISTEN; then
-  echo ""
-  echo "❌❌❌ PORT CONFLICT DETECTED ❌❌❌"
-  echo ""
-  echo "Port $KANASA_WG_PORT is already in use on this VPS."
-  echo ""
-  echo "👉 Please choose another port and re-run:"
-  echo ""
-  echo "   export KANASA_SERVER_KEY=${KANASA_SERVER_KEY}"
-  echo "   export KANASA_WG_PORT=<FREE_PORT>"
-  echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run.sh | bash"
-  echo ""
-  exit 1
+  if systemctl is-active --quiet oscam-checker; then
+    echo "✔ Port $KANASA_WG_PORT is already used by oscam-checker; continuing with upgrade"
+  else
+    echo ""
+    echo "❌❌❌ PORT CONFLICT DETECTED ❌❌❌"
+    echo ""
+    echo "Port $KANASA_WG_PORT is already in use on this VPS."
+    echo ""
+    echo "👉 Please choose another port and re-run:"
+    echo ""
+    echo "   export KANASA_SERVER_KEY=${KANASA_SERVER_KEY}"
+    echo "   export KANASA_WG_PORT=<FREE_PORT>"
+    echo "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run.sh | bash"
+    echo ""
+    exit 1
+  fi
+else
+  echo "✔ Port $KANASA_WG_PORT is free"
 fi
-echo "✔ Port $KANASA_WG_PORT is free"
 
 export KANASA_SERVER_KEY
 export KANASA_WG_PORT
@@ -201,4 +206,3 @@ else
   cat /tmp/kanasa_register_response.txt && echo ""
 fi
 rm -f /tmp/kanasa_register_response.txt
-

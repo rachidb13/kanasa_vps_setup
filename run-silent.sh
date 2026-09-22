@@ -63,20 +63,22 @@ fi
 
 # Silent port check
 if ss -lnt "( sport = :$KANASA_WG_PORT )" | grep -q LISTEN; then
-  _error \
-    "❌ Setup failed — required port is unavailable" \
-    "" \
-    "❌❌❌ PORT CONFLICT DETECTED ❌❌❌" \
-    "" \
-    "Port $KANASA_WG_PORT is already in use on this VPS." \
-    "" \
-    "👉 Please choose another port and re-run:" \
-    "" \
-    "   export KANASA_SERVER_KEY=${KANASA_SERVER_KEY}" \
-    "   export KANASA_WG_PORT=<FREE_PORT>" \
-    "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run-silent.sh | bash" \
-    ""
-  exit 1
+  if ! systemctl is-active --quiet oscam-checker; then
+    _error \
+      "❌ Setup failed — required port is unavailable" \
+      "" \
+      "❌❌❌ PORT CONFLICT DETECTED ❌❌❌" \
+      "" \
+      "Port $KANASA_WG_PORT is already in use on this VPS." \
+      "" \
+      "👉 Please choose another port and re-run:" \
+      "" \
+      "   export KANASA_SERVER_KEY=${KANASA_SERVER_KEY}" \
+      "   export KANASA_WG_PORT=<FREE_PORT>" \
+      "   curl -fsSL https://raw.githubusercontent.com/rachidb13/kanasa_vps_setup/001-silent-installer-mode/run-silent.sh | bash" \
+      ""
+    exit 1
+  fi
 fi
 
 export KANASA_SERVER_KEY
